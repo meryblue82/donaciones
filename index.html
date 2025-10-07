@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Donación por transferencia — Demo</title>
+  <style>
+    body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:#f3f4f6; margin:0; line-height:1.45}
+    .wrap{max-width:980px;margin:40px auto;padding:0 16px}
+    .card{max-width:880px;margin:0 auto;padding:24px;border-radius:16px;background:#f8fafc;box-shadow:0 6px 24px rgba(0,0,0,.07)}
+    .card h1{margin-top:0}
+    .datos-transferencia{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 16px 8px;margin:16px 0}
+    .dato{display:grid;grid-template-columns:160px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed #eee}
+    .dato:last-child{border-bottom:none}
+    .dato span{color:#6b7280}
+    button{border:0;border-radius:10px;padding:8px 12px;cursor:pointer}
+    .copiar{background:#e5f0ff}
+    .copiar:hover{background:#d7e8ff}
+    .selector-banco{margin:24px 0}
+    select{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px}
+    .cta{background:#1f6feb;color:#fff;margin-top:12px}
+    .cta:hover{background:#1a5ecb}
+    .nota{font-size:.9rem;color:#6b7280}
+    .post-accion{margin-top:24px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+    footer{color:#6b7280;font-size:.85rem;text-align:center;margin:24px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>Haz tu donación por transferencia</h1>
+      <p>Selecciona tu banco y realiza tu aporte. Los datos del beneficiario pueden copiarse con un clic.</p>
+
+      <div class="datos-transferencia" aria-labelledby="titulo-datos">
+        <h2 id="titulo-datos">Datos del beneficiario</h2>
+
+        <div class="dato"><span>Titular</span><strong id="titular">Fundación Ejemplo</strong><button class="copiar" data-copy="#titular">Copiar</button></div>
+        <div class="dato"><span>RUT</span><strong id="rut">12.345.678-9</strong><button class="copiar" data-copy="#rut">Copiar</button></div>
+        <div class="dato"><span>Tipo de cuenta</span><strong id="tipo">Cuenta Corriente</strong><button class="copiar" data-copy="#tipo">Copiar</button></div>
+        <div class="dato"><span>N° de cuenta</span><strong id="cuenta">1234567890</strong><button class="copiar" data-copy="#cuenta">Copiar</button></div>
+        <div class="dato"><span>Correo</span><strong id="correo">donaciones@fundacion.cl</strong><button class="copiar" data-copy="#correo">Copiar</button></div>
+
+        <p class="nota">Por seguridad, los bancos piden los datos por separado. Usa el botón <strong>Copiar</strong> en cada línea.</p>
+      </div>
+
+      <div class="selector-banco">
+        <h2>Selecciona tu banco</h2>
+        <label for="banco">Bancos en Chile</label>
+        <select id="banco">
+          <option value="">-- Elegir banco --</option>
+          <option value="https://www.bancoestado.cl/">BancoEstado</option>
+          <option value="https://banco.santander.cl/">Santander</option>
+          <option value="https://www.bci.cl/">BCI</option>
+          <option value="https://www.itau.cl/">Itaú</option>
+          <option value="https://www.scotiabankchile.cl/">Scotiabank</option>
+          <option value="https://www.bancochile.cl/">Banco de Chile</option>
+          <option value="https://www.falabella.com/falabella-cl/page/portal-banco-falabella">Banco Falabella</option>
+          <option value="https://www.security.cl/">Banco Security</option>
+          <option value="https://www.bice.cl/">Banco BICE</option>
+          <option value="https://www.hsbc.cl/">HSBC</option>
+        </select>
+
+        <button class="cta" id="irBanco">Ir al portal del banco</button>
+        <p class="nota">Se abrirá en una nueva pestaña. Por seguridad, los bancos no permiten pre-cargar automáticamente los campos de transferencia.</p>
+      </div>
+
+      <div class="post-accion">
+        <h3>¿Ya transferiste?</h3>
+        <p>Envía tu comprobante a <strong>donaciones@fundacion.cl</strong>.</p>
+      </div>
+    </section>
+    <footer>Demo estática para mostrar el diseño. La versión WordPress incluye header/footer del tema.</footer>
+  </div>
+
+  <script>
+    function copiarDesdeSelector(selector){
+      const el = document.querySelector(selector);
+      if(!el) return;
+      const val = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') ? el.value : el.textContent;
+      const txt = val.trim();
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(()=>alert('Copiado: '+txt))
+          .catch(()=>alert('No se pudo copiar.'));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = txt; ta.style.position='fixed'; ta.style.top='-1000px';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try { document.execCommand('copy'); alert('Copiado: '+txt); }
+        catch(e){ alert('No se pudo copiar.'); }
+        document.body.removeChild(ta);
+      }
+    }
+
+    document.querySelectorAll('.copiar').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        copiarDesdeSelector(this.getAttribute('data-copy'));
+      });
+    });
+
+    const irBanco = document.getElementById('irBanco');
+    if(irBanco){
+      irBanco.addEventListener('click', function(){
+        const url = document.getElementById('banco').value;
+        if(!url){ alert('Selecciona un banco'); return; }
+        window.open(url, '_blank', 'noopener');
+      });
+    }
+  </script>
+</body>
+</html>
